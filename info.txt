@@ -1,0 +1,50 @@
+CREATE TABLE parsed (
+    parse_id serial NOT NULL,
+    ineg character varying(50),
+    prefix character varying(100),
+    tense character varying(100),
+    rel character varying(50),
+    object character varying(50),
+    root character varying(50),
+	plus character varying(50),	
+	english character varying(50),
+    mode character varying(50),
+    suffix character varying(50)
+);
+
+ALTER TABLE ONLY parsed ADD CONSTRAINT parse_pkey PRIMARY KEY (parse_id);
+
+
+IMPORTANT - need to redo cli versions to match new parsed table layout and variable setting
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
