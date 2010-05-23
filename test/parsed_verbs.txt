@@ -1,0 +1,7 @@
+atakayeona		a[sp1-3s]taka[fut-rel]ye[rel1-3s]ON_(see)
+sipigi		si[neg+sp1-1s]PIG_(hit, beat)i[neg-gen]
+anayetaka		a[sp1-3s]na[curr]ye[rel1-3s]TAK_(want)
+hawangejua		ha[initneg]wa[sp2-3p]nge[cond]JU_(know)
+nikiona		ni[sp1-1s]ki[part]ON_(see)
+kilichompiga		ki[sp7]li[past]cho[rel7]m[op1-3s]PIG_(hit, beat)
+wanafurahi		wa[sp2-3p]na[curr]F-R-HH_(rejoice)
