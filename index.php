@@ -3,6 +3,26 @@ header("Content-type: text/html; charset=utf-8");
 include("includes/header.php");
 ?>
 
+<!--
+*********************************
+Copyright Kevin Donnelly 2010
+
+This file is part of the Swahili verb segmenter - http://kevindonnelly.org.uk/swahili/segmenter
+
+The segmenter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The segmenter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the segmenter.  If not, see <http://www.gnu.org/licenses/>.
+**********************************
+-->
 
 <div class="span-11">  <!-- begin first column -->
 
@@ -10,7 +30,7 @@ include("includes/header.php");
 
 <p>This webpage allows Swahili verbforms to be segmented for use in parsers or taggers.  Although some segmenters already exist, they either handle only a few basic forms, or are not available under an open license.  This segmenter handles all the one-word tenses in Swahili, and is licensed under the <a href="http://www.gnu.org/licenses/gpl.html">GPLv3</a> and the <a href="http://www.gnu.org/licenses/agpl.html">AGPLv3</a>.</p>
 
-<p>The segmenter will not specify the verb unless it is one of the 500-odd already in Beata Wójtowicz's <a href="www.freedict.org">FreeDict</a> Swahili dictionary.  As this dictionary is expanded, the segmenter will recognise more verbs.</p>
+<p>The segmenter uses the data from Beata Wójtowicz's <a href="www.freedict.org">FreeDict</a> Swahili dictionary, so it will not specify the verb unless it is one of the 500-odd which that dictionary already contains.  As the dictionary is expanded, the segmenter will recognise more verbs.</p>
 
 <p>Two variants of the segmenter exist: this web version, and a version that can be run from the command line against a file listing verbforms to be analysed.  It would also be possible to use this latter version as part of an application that would tag connected text.</p>
 
@@ -32,6 +52,7 @@ include("includes/header.php");
 
 <div class="span-11" last>  <!-- begin second column -->
 
+
 <h2>Usage</h2>
 
 <p>Simply type the word you want to check into the box above and press the button.  Suggested test forms are: <em>wanavyotaka</em>, <em>kilichompiga</em>, <em>afanyaye</em>, <em>husimama</em>, <em>sitaki</em>, <em>amekwendapi</em>, <em>utafikaje</em>.</p>
@@ -40,7 +61,9 @@ include("includes/header.php");
 
 <h2>Source code</h2>
 
-<p>The code and data for this application are available from the repository at Github.  The material also includes some instructions on setting up the application on Ubuntu GNU/Linux.  Any suggestions for improvement in either code or data are very welcome - contact me on:<br /><img src="images/email.png" width="115" height="17" /></p>
+<p>The code and data for this application are available from the <a href="http://thinkopen.co.uk/git/">Git repositories at ThinkOpen</a>.  If you have <a href="http://git-scm.com/">Git</a> installed, you can download the files by running:
+<div class="center"><em>git clone http://thinkopen.co.uk/git/segmenter</em></div>
+If not, you can download the files by going to <a href="http://thinkopen.co.uk/git/">http://thinkopen.co.uk/git/</a>, clicking on <em>segmenter</em>, then on <em>tree</em>, and finally on <em>snapshot</em>.  Any suggestions for improvement in either code or data are very welcome - contact me on:<br /><img src="images/email.png" width="115" height="17" /></p>
 
 <h2>A note on verb roots</h2>
 
