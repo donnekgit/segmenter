@@ -1,0 +1,333 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{appendix}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage[labelfont=bf,textfont=it]{caption}
+
+\setlength{\parindent}{0in}  % no paragraph indents
+\setlength{\parskip}{2ex}  % put a linespace between paragraphs
+
+\renewcommand{\rmdefault}{phv}
+
+%opening
+\title{\textbf{Swahili verb segmenter}}
+\author{Kevin Donnelly\thanks{kevin@dotmon.com}}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+These notes explain how to install the Swahili verb segmenter, and give some information on how it operates.
+\end{abstract}
+
+\section{Introduction}
+
+This verb segmenter allows Swahili verbforms to be segmented for use in parsers or taggers, or for the examination of verbform instances in corpora. Although some segmenters already exist, they either handle only a few basic forms, or are not available under an open license. This segmenter handles all the one-word tenses in Swahili, and is licensed under the GPLv3\footnote{http://www.gnu.org/licenses/gpl.html} and the AGPLv3\footnote{http://www.gnu.org/licenses/agpl.html}.  The segmenter has been built and tested on GNU/Linux, but it is likely to run also on legacy platforms like Microsoft Windows or Apple Mac OS X.
+
+Two variants of the segmenter exist: a browser-based version,\footnote{http://kevindonnelly.org.uk/swahili/segmenter} and a version that can be run from the command line against a file listing verbforms to be analysed. It would also be possible to use this latter version as part of an application that would tag connected text.
+
+The segmenter is currently relatively slow - working through a list of 140,000 possible verbforms drawn from Kevin Scannell's 5m-word \textit{Crubadán}\footnote{http://borel.slu.edu/crubadan/} Swahili corpus, its average analysis rate was around 87 verbforms per minute.
+
+\section{Background}
+
+The first iteration of this segmenter was a generating conjugator like the one I did for Welsh,\footnote{http://eurfa.org.uk} where I would set up verbal forms and affixes in a database, along with shaping or affixation rules, and then PHP scripts would stick all these together. This would have been much easier to do for a Bantu language than for an inflected language like Welsh. Even though many of the forms would have been semantically dubious, even if morphologically possible, that would not have mattered, since they could just sit quietly in the database, offending no-one. The main drawback would be that as new verbs were added to the dictionary, the relevant forms would have to be generated, but that could be done by a script.
+
+However, when I took the first steps of generating forms for the current present (\textbf{-na-}) tense, adding subject and object pronouns for all the classes, something emerged that should have been obvious from the start.  A first run-through yields about 400 forms for \textbf{-ambia} (\textit{say,tell}). And it turns out that of these 400 ``possible'' forms, only 15 (less than 4\%) occur in the \textit{Crubadán} Swahili corpus. Once we do a rough calculation, the enormity of the problem becomes apparent: 20 subject prefixes x 20 object prefixes x 25 tenses x 20 relatives x (say) 2,000 verbs (initially) = 400m entries!  Keeping millions of forms in a database when they may never be used was clearly impractical.
+
+So the segmenter now adopts an analytical approach, which takes advantage of the fact that Swahili verbs have specific slots for each type of morphological affix. There is some overlap, particularly where negative markers and the general present tense are concerned, but in general the sequence is fixed.  The verbform is segmented slot by slot, and the material in each slot is tagged with all possible affix information before moving on to the next.  
+
+For instance, in \textbf{anapika} (he/she is cooking), the \textbf{a-} is a marker for the third person singular of Class 1.  However, in \textbf{apika} (he/she cooks), it is a combined marker for the class and also the general present tense.  When the segmenter meets \textbf{a-}, it gives it the tag \textbf{[sp1-3s,sp1-3s+gen]}, reflecting both these possibilities.  Later, disambiguation rules strike out affix tags that are not applicable.  In this case, if no other tense marker is present the first tag is deleted, but if another tense marker like \textbf{-na-} is found, the second tag is deleted.
+
+This on-the-fly analysis has the advantage that you don’t need to generate the forms beforehand and add them to the dictionary (though of course you won’t get a verb lemma until you put an entry for it into the dictionary!).  The main disadvantage is that the analyser trusts you to put in correct forms -- it will analyse incorrect forms as best it can, which in some cases may give incorrect results.  The beginnings of a checker are therefore included, which means that even though the analyser cannot completely rule out incorrect forms, but it will flag the most obvious.  However, this feature needs more development so that a greater number of incorrect forms are dealt with.
+
+Verbal extensions (where -\textbf{pika} (cook) can produce -\textbf{pikwa}, -\textbf{pikia}, -\textbf{pikiwa}, -\textbf{pikisha}, -\textbf{pikika}, and so on) are not handled directly in the analyser. The main reasons for this are:
+\begin{itemize}
+\item they are less productive (of the 8 or so main extensions, many verbs may have only a few in common use);
+\item the morphology is more variable (often depending on the structure of the verb root), which makes analysis more complicated.
+\end{itemize}
+Instead, they are handled by giving them separate entries in the dictionary, with the extensions tagged there.  All the analyser does is replicate these in its analysis.  So \textbf{zilipelekewa} (they were sent to) will be analysed as:
+\begin{center}
+\textbf{zi[sp10]li[past]PELEK\_prep\_pass(be sent to)[\_unmarked]}
+\end{center}
+with the prepositional and passive extensions marked in the analysis.
+
+The main drawback here is that the extended verbs need to be added to the dictionary, but on the other hand in many cases the meaning of the extended verb is some distance from that of the root verb anyway, and giving this meaning in the analysis is probably more helpful than simply marking the extensions on-the-fly.  An example would be: -\textbf{elea} (\textit{be clear}), -\textbf{elewa} (\textit{know}), -\textbf{elewana} (\textit{reach agreement}), -\textbf{elekea} (\textit{face}), -\textbf{elekeza} (\textit{direct}).
+
+\section{Preparation}
+
+Your machine will need to have Apache2, PHP5, PostgreSQL, and (optionally) Git already installed.  The Appendix gives a summary of the relevant commands for Ubuntu 9.10, and suggests how to configure your machine to use these applications effectively -- note that this is only a suggestion, and other approaches are possible.
+
+By the end of this process, you should have an instance of the segmenter running on your local webserver, for interactive access, and the command-line version will be available for work on files containing verbforms.
+
+\section{Usage}
+
+To use the browser version, go to your local installation as detailed in Section F of the Appendix, and type in a verb you want to segment.
+
+To use the command-line version, go to the install directory (\textbf{/srv/www/seg\-menter/public\_html} if you have followed the steps in the Appendix), open a terminal, and enter:\\
+\verb|php cli\_segment.php|
+
+By default, this will parse a small selection of tenses in the \textbf{test/verbs.txt} file, depositing the output in \textbf{test/parsed\_verbs.txt}, as well as echoing it to screen.  To segment your own list of verbs, adjust the \textbf{\$input} line in \textbf{cli\_segment.php} with the location of that list, or replace the contents of \textbf{test/verbs.txt} with your own data.
+
+\section{Method}
+
+The segmenter uses the data from Beata Wójtowicz's FreeDict Swahili dictionary, so it will not specify the verb unless it is one of the 500-odd which that dictionary already contains. As the dictionary is expanded, the segmenter will recognise more verbs.
+
+The approach used here takes advantage of the fact that Swahili verbs have specific slots for each type of morphological affix. There is some overlap, particularly where negative markers and the general present tense are concerned, but in general the sequence is fixed.
+
+The segmentation and tagging is done in \textbf{segment.php} for the web version, and \textbf{cli\_segment.php} for the command-line version.  The only real differences between these two files is that the former allows for more complex handling of the output (\textbf{display.php}), and the latter refers to a verbform list instead of taking input from a web page.
+
+The verbform is segmented sequentially slot by slot, using the functions \textbf{cutter\_end()} for suffixes and \textbf{cutter()} for prefixes -- these and other functions are in the file \textbf{includes/fns.php}.  The material in each slot is then tagged with morphological information.  Table~\ref{table:segslots} shows the order in which the segmentation takes place, and gives some examples of the affixes that occur in that slot, with the tags the segmenter assigns to them.  The relevant function used is also listed.  Tables~\ref{table:verbtags} and \ref{table:othertags} list the tags used.  The tags assigned can be changed by adjusting the text in the relevant function -- for instance, if you want to change the tag for \textbf{zi-} (sp10), you can adjust this line in the \textbf{prefixes()} function:\\
+\verb|$text=preg_replace("/^(zi)/u", "$1[sp10]::", $text);|\\
+to read:\\
+\verb|$text=preg_replace("/^(zi)/u", "$1[SUBJ_Class10]::", $text);|\\
+or whatever you wish.  This would change the tag for \textbf{zi-} from \textit{sp10} to \textit{SUBJ\_\-Class10}.  Bear in mind that the disambiguation and correction rules (see below) may also need to be adjusted accordingly.
+
+\begin{table}
+\begin{tabularx}{\textwidth}{>{\hsize=1.4\hsize}X>{\hsize=0.8\hsize}X>{\hsize=1.3\hsize}X>{\hsize=0.5\hsize}X} 
+\textbf{Affixes} & \textbf{Examples} & \textbf{Equivalent tags} & \textbf{Function} \\
+\hline\noalign{\smallskip}
+suffixes & \textit{-ye, -zo, -pi, \mbox{-je}} & endrel1, endrel10, int-where, int-how & suffixes() \\
+\hline\noalign{\smallskip}
+negative \textit{ha-} & \textit{ha-} & initneg & ineg() \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+subject pronouns, negatives, infinitive, habitual & \textit{ni-, si-, ku-, hu-} & sp1-1s, neg\-+sp1-1s, infin15, hab & prefixes() \\
+\hline\noalign{\smallskip}
+tense and mood markers and negative particles & \textit{-li-, -sipo-, \mbox{-ki-}} & past, part-neg, cons & tenses() \\
+\hline\noalign{\smallskip}
+relatives & \textit{-ye-, -zo-} & rel1, rel10 & relatives() \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+objects & \textit{-tu-, -zi-, -ji-} & op2-1p, op10, refl & objects()
+\end{tabularx}
+\caption{Segmentation slots}
+\label{table:segslots}
+\end{table}
+
+\begin{table}
+\newcommand{\mc}[3]{\multicolumn{#1}{#2}{#3}}
+\begin{tabularx}{\textwidth}{>{\hsize=0.5\hsize}X>{\hsize=1.5\hsize}X>{\hsize=0.5\hsize}X>{\hsize=1.5\hsize}X} 
+\mc{2}{l}{\textbf{Tenses, moods, aspects}} & \mc{2}{l}{\textbf{Verbal extensions}} \\
+\hline\noalign{\smallskip}
+\textit{comp} & completive \textbf{-sha-, -isha-, -kwisha-} & \textit{assoc} & associative extension \textbf{\mbox{-an-}} \\ 
+\textit{conc} & concessional \textbf{-nga-} & \textit{caus} & causative extension \textbf{-iz-, -ez-, -ish-, -esh-, -y-} \\ 
+\textit{cond} & conditional \textbf{-nge-} & \textit{cont} & continuative extension \textbf{-t-} \\ 
+\textit{cons} & consecutive \textbf{-ka-} & \textit{conv} & conversive extension \textbf{-u-, -o-} \\ 
+\textit{curr} & current present \textbf{-na-} & \textit{inc} & inceptive extension \textbf{-p-} \\ 
+\textit{fut} & future \textbf{-ta-} & \textit{pass} & passive extension \textbf{-w-} \\ 
+\textit{hab} & habitual \textbf{hu-} & \textit{pos} & positional extension \textbf{-m-} \\ 
+\textit{hypo} & hypothetical \textbf{-japo-} & \textit{prep} & prepositional extension \textbf{\mbox{-i-}, -e-} \\ 
+\textit{imp} & imperative \textbf{-e} & \textit{stat} & stative extension \textbf{-ik-, \mbox{-ek-}} \\ 
+\textit{gen} & general present \textbf{-a-} &  &  \\ 
+\textit{part} & participial \textbf{-ki-} &  &  \\ 
+\textit{past} & past \textbf{-li-} &  &  \\ 
+\textit{perf} & perfective \textbf{-me-} &  &  \\ 
+\textit{subj} & subjunctive \textbf{-e} &  &  \\ 
+\textit{supp} & suppositional \textbf{-ngali-} & & 
+\end{tabularx}
+\caption{Tense and extension tags}
+\label{table:verbtags}
+\end{table}
+
+\begin{table}
+\newcommand{\mc}[3]{\multicolumn{#1}{#2}{#3}}
+\begin{tabularx}{\textwidth}{>{\hsize=0.3\hsize}X>{\hsize=1.5\hsize}X>{\hsize=0.7\hsize}X>{\hsize=1.5\hsize}X} 
+\mc{2}{l}{\textbf{Pronouns}} & \mc{2}{l}{\textbf{Miscellaneous}} \\ 
+\hline\noalign{\smallskip}
+\textit{sp} & subject pronoun - numbers refer to the class & \textit{\_unmarked} & unmarked (default) vowel ending \\ 
+\textit{op} & object pronoun - numbers refer to the class & \textit{endrel} & end relative \\ 
+\textit{1s} & first person singular & \textit{initneg} & initial negative \\ 
+\textit{2s} & second person singular & \textit{int-how} & interrogative how \textbf{-je?} \\ 
+\textit{3s} & third person singular & \textit{int-what} & interrogative what \textbf{-ni?} \\ 
+\textit{1p} & first person plural & \textit{int-where} & interrogative where \textbf{-pi?} \\ 
+\textit{2p} & second person plural & \textit{ms} & monosyllabic prop \\ 
+\textit{3p} & third person plural & \textit{neg} & negative \\ 
+\textit{refl} & reflexive & \textit{pl} & plural \\ 
+ &  & redup & reduplicated \\ 
+ &  & rel & relative
+\end{tabularx}
+\caption{Other tags}
+\label{table:othertags}
+\end{table}
+
+
+After each such segmentation, the remainder of the verbform is checked against the dictionary in the \textbf{vbdict} table, using the \textbf{lookup()} function, to see if it can be interpreted as a verb stem, and whether or not it seems to have a negative (\textbf{-i}) or subjunctive (\textbf{-e}) verb ending.  After each stage, the affix information and the verb information (if any) are written to the \textbf{parsed} table.
+
+Once an entry has been found in the dictionary, no further segmentation is done, and the information is read out of the \textbf{parsed} table to give the final parsed form.
+
+This form is then examined in order to see whether some tags are inconsistent with others and can therefore be struck out. This is done in \textbf{disambiguate.php} for the web version and \textbf{disambiguate.php} for the command-line version, although the only real difference between the two is that the former prints out more feedback.  The disambiguation is similar to constraint grammar,\footnote{http://beta.visl.sdu.dk/constraint\_grammar.html} but working within the word boundary rather than across it.  There are in fact arguments for using CG for this purpose, but on balance I decided that adding an additional dependency to the segmenter was not justified at present - perhaps in the future!
+
+The existing disambiguation rules need to be extended, since there are a few areas where mutually exclusive tags are not resolved.
+
+A related area is error-checking. As noted earlier, initial work has been done on this, with suggestions to the user as to how to correct a few obvious errors, but this needs to be greatly extended.  One of the problems here is where to draw the line -- there are in fact an infinite number of errors that can be made, and since the segmenter works by \textit{ad hoc} analysis, it has no list of definitively correct forms.  Progressive refinement of the error-checking is therefore a long-term project.
+
+\section{Future development}
+
+It would be interesting to port this segmenter to other Bantu languages like Shona or Zulu.  Even though tone is not marked in the orthography of many Bantu languages, the segmenter should ideally deal with tonal distinctions as well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\appendix
+\renewcommand{\appendixpagename}{Appendix:\\
+Configuring Ubuntu 9.10}
+\appendixpage
+
+These instructions should also work on Ubuntu 10.04. In either case, they assume a properly-working desktop with network access.
+
+\section{Install relevant software}
+
+Install Apache (webserver), PHP5 (scripting system), and PostgreSQL (database), phpPgAdmin (browser interface to PostgreSQL), and (optionally) Git (versioning system) and pgAdminIII (desktop interface to PostgreSQL):
+
+\texttt{sudo apt-get install git-core, apache2, apache2-utils, libapache2-mod-php5, php5, php-pear, php5-xcache, php5-pgsql, postgresql, phppgadmin, pgadmin3}
+
+\section{Configure Apache}
+
+\subsection{Configure a virtual host}
+
+\texttt{sudo nano /etc/apache2/sites-available/segmenter}
+
+Place the following in the file:
+
+\begin{verbatim}
+<VirtualHost *:80>
+ServerName segmenter
+DocumentRoot /srv/www/segmenter/public_html/
+</VirtualHost>
+\end{verbatim}
+
+\subsection{Tell the PC about the new virtual host}
+
+\texttt{sudo nano /etc/hosts}
+
+Add the following line:
+
+\texttt{127.0.0.1	segmenter}
+
+\subsection{Enable the site and restart Apache}
+
+\texttt{sudo a2ensite segmenter}
+
+\texttt{sudo /etc/init.d/apache2 restart}
+
+\subsection{Give your normal user access to the \texttt{/srv} directory}
+
+\texttt{sudo chown -R myuser.myuser /srv}
+
+\subsection{Create a directory structure for the virtual host you set up earlier}
+
+\texttt{mkdir -p /srv/www/segmenter/public\_html}
+
+\subsection{Create a front-page for the virtual host}
+
+\texttt{cd /srv/www/segmenter/public\_html}
+
+\texttt{nano index.html}
+
+Enter the following:
+
+\begin{verbatim}
+<html>
+<head>
+<title>Segmenter</title>
+</head>
+<body>
+Front page for segmenter virtual host.
+</body>
+</html>
+\end{verbatim}
+
+If you now enter \textbf{segmenter} in the address bar of your browser you should see a page reading \textit{Front page for segmenter virtual host}.
+
+\section{Configure PostgreSQL}
+
+\subsection{Set PostgreSQL to use passwords}
+
+\texttt{sudo nano /etc/postgresql/8.4/main/pg\_hba.conf}
+
+Change the line:
+
+\texttt{local   all	all	ident}
+
+to:
+
+\texttt{local   all	all	md5}
+
+\subsection{Create a database user}
+
+\texttt{sudo -i}
+
+\texttt{su - postgresql}
+
+\texttt{createuser -P mypguser}
+
+Enter a password (twice), and enter \textbf{y} at the superuser question.
+
+Enter \textbf{exit} twice to return to your normal (desktop) user.
+
+You will have to use the username/password you have just entered to replace the default \textit{kevin/kevindbs} near the top of the \texttt{.php} scripts in the download.
+
+\section{Download the segmenter}
+
+In a working directory of your choice, run:\\
+\texttt{git clone http://thinkopen.co.uk/git/segmenter}\\
+The files will be downloaded into a \textit{segmenter} folder in your working directory.
+
+If you have chosen not to install Git, you can instead download the files by going to \textbf{http://thinkopen.co.uk/git/}, clicking on \textbf{segmenter}, then on \textbf{tree}, and finally on \textbf{snapshot}.  This will download a tarball containing the files.  Uncompress this to create a \texttt{segmenter} folder in your working directory.
+
+Copy all the files in the \texttt{segmenter} folder to your new web directory at \texttt{\url{/srv/www/segmenter/public_html}}.  Delete the \textbf{index.html} file you created earlier at B.6.
+
+\section{Initialise the database}
+
+\subsection{Create the database}
+
+Go the the \texttt{dbs} folder and create a new database:
+
+\texttt{createdb -U mypguser swahili}
+
+using the PostgreSQL user you created earlier at C.2.  Enter your PostgreSQL password when prompted.
+
+\subsection{Import the tables}
+
+Log in to psql as your user:
+
+\texttt{psql -U mypguser swahili}
+
+At the \verb|swahili=#| prompt, enter:
+
+\verb|\i vbdict.sql|
+
+\verb|\i parsed.sql|
+
+Enter \verb|\q| to exit \textbf{psql}.
+
+\subsection{Configure the database connection}
+
+Open a text editor, and replace the username and password in the file \textbf{swahili/config.php} with the PostgreSQL username and password you created earlier at C.2.
+
+Move the configuration details out of the web tree:
+
+\texttt{sudo mv siarad /opt}
+
+\section{Test access}
+
+Open a web browser, and enter \textbf{segmenter} on the location line.  You should see the front page of the segmenter.
+
+If this does not work, contact me at \textbf{kevin@dotmon.com}.
+
+\end{document}

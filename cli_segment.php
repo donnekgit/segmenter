@@ -1,5 +1,26 @@
 <?php
 
+/*
+*********************************
+Copyright Kevin Donnelly 2010
+
+This file is part of the Swahili verb segmenter - http://kevindonnelly.org.uk/swahili/segmenter
+
+The segmenter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The segmenter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the segmenter.  If not, see <http://www.gnu.org/licenses/>.
+**********************************
+*/
+
 // do initial setup
 include("swahili/config.php");
 include("includes/fns.php");
@@ -27,7 +48,6 @@ foreach ($lines as $line)
 	$result=query("alter sequence parsed_parse_id_seq restart 1");
 	
 	$got_verb=0;  // set up a check so that once a verb match is found, we stop trying to segment
-	$verb='';
 	
 	//suffixes
 	$suff=suffixes($verbform);
@@ -48,10 +68,10 @@ foreach ($lines as $line)
 	$pref=prefixes($remnant);
 	//echo "pref: ".$pref."\n";
 	cutter($pref);
-	lookup_cli($remnant);
-	if (isset($found)) {$got_verb=1; $verb=$found;}
-	$result2=query("update parsed set prefix='$parse', verb='$found', mode='$mode'");
-	unset($found,$mode,$parse,$end);
+	lookup($remnant);
+	if (isset($found)) {$got_verb=1;}
+	$result2=query("update parsed set prefix='$parse', root='$root', plus='$plus', english='$english', mode='$mode'");
+	unset($verb,$root,$plus,$english,$mode,$parse,$end);
 	}
 	
 	if ($got_verb==0)
@@ -60,10 +80,10 @@ foreach ($lines as $line)
 	$tense=tenses($remnant);
 	//echo "tense: ".$tense."\n";
 	cutter($tense);
-	lookup_cli($remnant);
-	if (isset($found)) {$got_verb=1; $verb=$found;}
-	$result3=query("update parsed set tense='$parse', verb='$found', mode='$mode'");
-	unset($found,$mode,$parse,$end);
+	lookup($remnant);
+	if (isset($root)) {$got_verb=1; $verb=$root."_".$plus."(".$english.")";}
+	$result3=query("update parsed set tense='$parse', root='$root', plus='$plus', english='$english', mode='$mode'");
+	unset($verb,$root,$plus,$english,$mode,$parse,$end);
 	}
 	
 	if ($got_verb==0)
@@ -72,10 +92,10 @@ foreach ($lines as $line)
 	$rel=relatives($remnant);
 	//echo "rel: ".$rel."\n";
 	cutter($rel);
-	lookup_cli($remnant);
-	if (isset($found)) {$got_verb=1; $verb=$found;}
-	$result4=query("update parsed set rel='$parse', verb='$found', mode='$mode'");
-	unset($found,$mode,$parse,$end);
+	lookup($remnant);
+	if (isset($root)) {$got_verb=1; $verb=$root."_".$plus."(".$english.")";}
+	$result4=query("update parsed set rel='$parse', root='$root', plus='$plus', english='$english', mode='$mode'");
+	unset($verb,$root,$plus,$english,$mode,$parse,$end);
 	}
 	
 	if ($got_verb==0)
@@ -84,10 +104,10 @@ foreach ($lines as $line)
 	$obj=objects($remnant);
 	//echo "obj: ".$obj."\n";
 	cutter($obj);
-	lookup_cli($remnant);
-	if (isset($found)) {$got_verb=1; $verb=$found;}
-	$result5=query("update parsed set object='$parse', verb='$found', mode='$mode'");
-	unset($found,$mode,$parse,$end);
+	lookup($remnant);
+	if (isset($root)) {$got_verb=1; $verb=$root."_".$plus."(".$english.")";}
+	$result5=query("update parsed set object='$parse', root='$root', plus='$plus', english='$english', mode='$mode'");
+	unset($verb,$root,$plus,$english,$mode,$parse,$end);
 	}
 	
 	//echo "verb: ".$verb."\n";
@@ -107,7 +127,7 @@ foreach ($lines as $line)
 	$result_layout=query("select * from parsed");
 	while ($row_layout=pg_fetch_object($result_layout))
 	{
-		$final=$row_layout->ineg.$row_layout->prefix.$row_layout->tense.$row_layout->rel.$row_layout->object.$row_layout->verb.$row_layout->mode.$row_layout->suffix;
+		$final=$row_layout->ineg.$row_layout->prefix.$row_layout->tense.$row_layout->rel.$row_layout->object.$row_layout->root.$row_layout->plus."(".$row_layout->english.")".$row_layout->mode.$row_layout->suffix;
 	}
 	echo "\n".$final."\n\n";
 

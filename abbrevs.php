@@ -1,3 +1,24 @@
+<!--
+*********************************
+Copyright Kevin Donnelly 2010
+
+This file is part of the Swahili verb segmenter - http://kevindonnelly.org.uk/swahili/segmenter
+
+The segmenter is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The segmenter is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the segmenter.  If not, see <http://www.gnu.org/licenses/>.
+**********************************
+-->
+
 <hr>
 <div class="span-24">
 <h2>Abbreviations</h2>
@@ -59,6 +80,7 @@
 <tr><td><em>refl</em></td><td>reflexive</td></tr>
 
 <tr><th colspan="2"><h3>Miscellaneous</h3></th></tr>
+<tr><td><em>_unmarked</em></td><td>unmarked (default) vowel ending</td></tr>
 <tr><td><em>endrel</em></td><td>end relative</td></tr>
 <tr><td><em>initneg</em></td><td>initial negative</td></tr>
 <tr><td><em>int-how</em></td><td>interrogative how (<em>-je?</em>)</td></tr>

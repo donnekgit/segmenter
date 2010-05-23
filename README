@@ -1,0 +1,5 @@
+This Swahili verb segmenter is copyright Kevin Donnelly 2010.
+
+Documentation is in the docs folder.
+
+All files are released under the GPLv3 and the AGPLv3 - see the accompanying license information - except for the files in the css folder.  Blueprint uses the GPLv2 license, the SIL Scheherezade font the Open Font License, and the Gazelle font appears to be freeware.  See the license information in that folder for further details.

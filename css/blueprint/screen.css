@@ -23,6 +23,13 @@ blockquote, q {quotes:"" "";}
 a img {border:none;}
 
 /* typography.css */
+
+
+@font-face {
+	font-family: 'GazelleFLF';
+	src: url('fonts/GazelleFLF.eot');
+	src: local('fonts/GazelleFLF'), local('/fonts/GazelleFLF'), url('/fonts/GazelleFLF.woff') format('woff'), url('fonts/GazelleFLF.ttf') format('truetype'), url('/fonts/GazelleFLF.svg#GazelleFLF') format('svg');
+}
 html {font-size:100.01%;}
 body {font-size:75%;color:#222;background:#6699cc;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
 h1, h2, h3, h4, h5, h6 {font-weight:normal;color:#6699cc;font-family:"GazelleFLF", Arial, Helvetica, sans-serif;}
