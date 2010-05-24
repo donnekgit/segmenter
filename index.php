@@ -42,7 +42,7 @@ along with the segmenter.  If not, see <http://www.gnu.org/licenses/>.
 
 <p>The segmenter first removes and stores suffixes such as relative particles and the enclitics <em>-ni</em>, <em>-pi</em>, <em>-je</em>.  Prefixes are then split off the verbform slot by slot, and tagged with morphological information.  After each such split, the remainder of the verbform is checked against the dictionary to see if it can be interpreted as a verb, and whether or not it seems to have a negative (<em>-i</em>) or subjunctive (<em>-e</em>) verb ending.  If so, then no further splitting is done, and the stored suffixes are added back to give a full parsed form.</p>
 
-<p>Once the parse has been completed, it is examined in order to see whether some tags are inconsistent with others and can therefore be struck out.  This disambiguation is similar to constraint grammar, but working within the word boundary rather than across it.  A related area is error-checking.  Initial work has been done on this, with suggestions to the user as to how to correct obvious errors, but this needs to be greatly extended.</p>
+<p>Once the parse has been completed, it is examined in order to see whether some tags are inconsistent with others and can therefore be struck out.  This disambiguation is similar to <a href="http://beta.visl.sdu.dk/constraint_grammar.html">constraint grammar</a>, but working within the word boundary rather than across it.  A related area is error-checking.  Initial work has been done on this, with suggestions to the user as to how to correct obvious errors, but this needs to be greatly extended.</p>
 
 </div>  <!-- end first column -->
 
