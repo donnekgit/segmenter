@@ -16,8 +16,7 @@ type="text/css" media="screen, projection"><![endif]-->
 <body>
 
 <div class="banner">
-  <a href="index.php"><img src="images/header.png" width="671" height="129"
-/></a>
+  <a href="index.php"><img src="images/header.png" width="671" height="129"/></a>
 </div>
 
 
