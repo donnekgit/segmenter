@@ -61,9 +61,7 @@ along with the segmenter.  If not, see <http://www.gnu.org/licenses/>.
 
 <h2>Source code</h2>
 
-<p>The code and data for this application are available from the <a href="http://thinkopen.co.uk/git/">Git repositories at ThinkOpen</a>.  If you have <a href="http://git-scm.com/">Git</a> installed, you can download the files by running:
-<div class="center"><em>git clone http://thinkopen.co.uk/git/segmenter</em></div>
-If not, you can download the files by going to <a href="http://thinkopen.co.uk/git/">http://thinkopen.co.uk/git/</a>, clicking on <em>segmenter</em>, then on <em>tree</em>, and finally on <em>snapshot</em>.  Any suggestions for improvement in either code or data are very welcome - contact me on:<br /><img src="images/email.png" width="115" height="17" /></p>
+<p>The code and data for this application are available from the <a href="https://github.com/donnekgit/segmenter">GitHub</a>.  Any suggestions for improvement in either code or data are very welcome - contact me on:<br /><img src="images/email.png" width="115" height="17" /></p>
 
 <h2>A note on verb roots</h2>
 
